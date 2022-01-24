@@ -14,7 +14,7 @@ unless files_to_commit.empty?
 
 else
 
-	puts "you fucking moron, you didn't add any files, exiting now, bye"
+	puts 'you fucking moron, can you add at least ONE fucking file?? Exiting now, bye'
 	exit 1
 
 end
@@ -33,6 +33,6 @@ unless commit_message.empty?
 
 end
 
-puts "can you fucking give me a commit message to work with? As if I were asking for too much ffs, exiting now"
+puts 'can you fucking give me a commit message to work with? As if I were asking for too much ffs, exiting now'
 `git reset`
 exit 1
