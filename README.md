@@ -37,7 +37,7 @@
 ## LICENSE
 
 * If you use code from this repository you agree to linking the GitHub project and/or my twitter in your project.
-* **IT'S FORBIDDEN** the redistribution of this source code or packages from it, it's only meant for **EDUCATIONAL purposes.**
+* **IT'S FORBIDDEN** the redistribution of this source code or packages from it, it's only meant for **EDUCATIONAL PURPOSES.**
 * **IT'S FORBIDDEN** the usage of this project to make profit out it, no matter the kind.
 
 
