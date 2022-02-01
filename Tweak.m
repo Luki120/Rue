@@ -220,7 +220,6 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 	blurredView.alpha = 0;
 	blurredView._blurQuality = @"high";
 	blurredView.blurRadiusSetOnce = NO;
-	blurredView.userInteractionEnabled = NO;
 	[self.view insertSubview:blurredView atIndex:0];
 
 	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didDoubleTapHS)];
@@ -262,7 +261,6 @@ static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 	dimmedView.alpha = 0;
 	dimmedView.frame = UIScreen.mainScreen.bounds;
 	dimmedView.backgroundColor = UIColor.blackColor;
-	dimmedView.userInteractionEnabled = NO;
 	[self addSubview: dimmedView];
 
 }
