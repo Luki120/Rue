@@ -58,23 +58,7 @@
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
 
 	[self setupSearchEngine];
-
-	httpURLString = [NSString stringWithFormat:@"%@", searchBar.text];
-	vanillaURLString = [NSString stringWithFormat:@"https://%@", searchBar.text];
-
-	NSURL *httpURL = [NSURL URLWithString: httpURLString];
-	NSURL *searchableStringURL = [NSURL URLWithString: searchableString];
-	NSURL *vanillaURL = [NSURL URLWithString: vanillaURLString];
-
-	if([searchBar.text hasPrefix:@"http"])
-
-		[UIApplication.sharedApplication openURL:httpURL options:@{} completionHandler:nil];
-
-	else if([searchBar.text hasPrefix:@"www"])
-
-		[UIApplication.sharedApplication openURL:vanillaURL options:@{} completionHandler:nil];
-
-	else [UIApplication.sharedApplication openURL:searchableStringURL options:@{} completionHandler:nil];
+	[self setupURLTypesFor: searchBar];
 
 	[searchBar resignFirstResponder];
 
@@ -130,6 +114,28 @@
 			break;
 
 	}
+
+}
+
+
+- (void)setupURLTypesFor:(UISearchBar *)rueSearchBar {
+
+	httpURLString = [NSString stringWithFormat:@"%@", rueSearchBar.text];
+	vanillaURLString = [NSString stringWithFormat:@"https://%@", rueSearchBar.text];
+
+	NSURL *httpURL = [NSURL URLWithString: httpURLString];
+	NSURL *searchableStringURL = [NSURL URLWithString: searchableString];
+	NSURL *vanillaURL = [NSURL URLWithString: vanillaURLString];
+
+	if([rueSearchBar.text hasPrefix:@"http"])
+
+		[UIApplication.sharedApplication openURL:httpURL options:@{} completionHandler:nil];
+
+	else if([rueSearchBar.text hasPrefix:@"www"])
+
+		[UIApplication.sharedApplication openURL:vanillaURL options:@{} completionHandler:nil];
+
+	else [UIApplication.sharedApplication openURL:searchableStringURL options:@{} completionHandler:nil];
 
 }
 
