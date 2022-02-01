@@ -45,24 +45,12 @@
 	if(self.rueSearchBar) return;
 
 	self.rueSearchBar = [UISearchBar new];
-	self.rueSearchBar.tag = 1337;
 	self.rueSearchBar.delegate = self;
 	self.rueSearchBar.placeholder = @"Search";
+	self.rueSearchBar.keyboardType = UIKeyboardTypeURL;
 	self.rueSearchBar.returnKeyType = UIReturnKeyDone;
 	self.rueSearchBar.backgroundImage = [UIImage new];
 	self.rueSearchBar.translatesAutoresizingMaskIntoConstraints = NO;
-
-}
-
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-
-	[self setupSearchEngine];
-	[self setupURLTypesFor: searchBar];
-
-	[searchBar resignFirstResponder];
-
-	self.rueSearchBar.text = @"";
 
 }
 
@@ -118,6 +106,13 @@
 }
 
 
+- (void)setupSearchEngineWithEngine:(NSString *)engine {
+
+	searchableString = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+
+}
+
+
 - (void)setupURLTypesFor:(UISearchBar *)rueSearchBar {
 
 	httpURLString = [NSString stringWithFormat:@"%@", rueSearchBar.text];
@@ -140,9 +135,14 @@
 }
 
 
-- (void)setupSearchEngineWithEngine:(NSString *)engine {
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
 
-	searchableString = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+	[self setupSearchEngine];
+	[self setupURLTypesFor: searchBar];
+
+	[searchBar resignFirstResponder];
+
+	self.rueSearchBar.text = @"";
 
 }
 
