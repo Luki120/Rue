@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# 2022 © Luki120
+
 # tiny Ruby script to automate git bc we are giga chads here
 # feel free to use it, or ignore it
 # and yes, in Ruby because Bash's syntax fucking sucks
