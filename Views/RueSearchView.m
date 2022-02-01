@@ -3,7 +3,9 @@
 
 @implementation RueSearchView {
 
-	NSString *stringToSearch;
+	NSString *httpURLString;
+	NSString *searchableString;
+	NSString *vanillaURLString;
 
 }
 
@@ -57,9 +59,22 @@
 
 	[self setupSearchEngine];
 
-	NSURL *theURL = [NSURL URLWithString: stringToSearch];
+	httpURLString = [NSString stringWithFormat:@"%@", searchBar.text];
+	vanillaURLString = [NSString stringWithFormat:@"https://%@", searchBar.text];
 
-	[UIApplication.sharedApplication openURL:theURL options:@{} completionHandler:nil];
+	NSURL *httpURL = [NSURL URLWithString: httpURLString];
+	NSURL *searchableStringURL = [NSURL URLWithString: searchableString];
+	NSURL *vanillaURL = [NSURL URLWithString: vanillaURLString];
+
+	if([searchBar.text hasPrefix:@"http"])
+
+		[UIApplication.sharedApplication openURL:httpURL options:@{} completionHandler:nil];
+
+	else if([searchBar.text hasPrefix:@"www"])
+
+		[UIApplication.sharedApplication openURL:vanillaURL options:@{} completionHandler:nil];
+
+	else [UIApplication.sharedApplication openURL:searchableStringURL options:@{} completionHandler:nil];
 
 	[searchBar resignFirstResponder];
 
@@ -121,7 +136,25 @@
 
 - (void)setupSearchEngineWithEngine:(NSString *)engine {
 
-	stringToSearch = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+	searchableString = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+
+}
+
+
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
+
+	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeInNow" object:nil];
+
+	return YES;
+
+}
+
+
+- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
+
+	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeOutNow" object:nil];
+
+	return YES;
 
 }
 
