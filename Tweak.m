@@ -11,8 +11,8 @@ static void crossDissolveViews() {
 		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: dockView.topAnchor constant: topConstant];
 		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
 
-		dimmedView.alpha = 0;
 		blurredView.alpha = 0;
+		dimmedView.alpha = 0;
 		iconScrollView.alpha = 1;
 
 	} completion:nil];
@@ -79,15 +79,19 @@ static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
 		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: guide.topAnchor constant: 10];
 		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
 
-		dimmedView.alpha = 0.60;
 		blurredView.alpha = 0.85;
+		dimmedView.alpha = 0.60;
 		iconScrollView.alpha = 0.45;
 
 	} completion:^(BOOL finished) {
 
-		doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:hsVC action:@selector(didDoubleTapHS)];
-		doubleTap.numberOfTapsRequired = 2;
-		[hsVC.view addGestureRecognizer: doubleTap];
+		doubleTap.enabled = YES;
+
+		for(UIView *subview in self.superview.subviews)
+
+			if(![subview isEqual:self])
+
+				subview.userInteractionEnabled = NO;
 
 	}];
 
@@ -101,13 +105,19 @@ static void new_keyboardWillHide(SBDockView *self, SEL _cmd) {
 		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: self.topAnchor constant: topConstant];
 		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
 
-		dimmedView.alpha = 0;
 		blurredView.alpha = 0;
+		dimmedView.alpha = 0;
 		iconScrollView.alpha = 1;
 
 	} completion:^(BOOL finished) {
 
-		[hsVC.view removeGestureRecognizer:doubleTap];
+		doubleTap.enabled = NO;
+
+		for(UIView *subview in self.superview.subviews)
+
+			if(![subview isEqual:self])
+
+				subview.userInteractionEnabled = YES;
 
 	}];
 
@@ -139,7 +149,7 @@ static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint
 
 	}
 
-	return nil;
+    return nil;
 
 }
 
@@ -162,8 +172,8 @@ static void overrideDMTS(SBDockView *self, SEL _cmd) {
 	[self setupRue];
 
 	[NSNotificationCenter.defaultCenter removeObserver:self];
-	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow) name:UIKeyboardWillShowNotification object:nil];
-	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide) name:UIKeyboardWillHideNotification object:nil];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow) name:@"fadeInNow" object:nil];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide) name:@"fadeOutNow" object:nil];
 
 	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupRue) name:@"rueSetupDone" object:nil];
@@ -178,11 +188,7 @@ static void new_setupDockConstraints(SBRootFolderDockIconListView *self, SEL _cm
 
 	self.translatesAutoresizingMaskIntoConstraints = NO;
 	[self.centerXAnchor constraintEqualToAnchor: self.superview.centerXAnchor].active = YES;
-
-	dockIconsCenterYConstraint.active = NO;
-	dockIconsCenterYConstraint = [self.centerYAnchor constraintEqualToAnchor: self.superview.centerYAnchor];
-	dockIconsCenterYConstraint.constant = dockIconsCenterYConstant;
-	dockIconsCenterYConstraint.active = YES;
+	[self.centerYAnchor constraintEqualToAnchor: self.superview.centerYAnchor constant: 22.5].active = YES;
 
 }
 
@@ -214,7 +220,13 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 	blurredView.alpha = 0;
 	blurredView._blurQuality = @"high";
 	blurredView.blurRadiusSetOnce = NO;
+	blurredView.userInteractionEnabled = NO;
 	[self.view insertSubview:blurredView atIndex:0];
+
+	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didDoubleTapHS)];
+	doubleTap.enabled = NO;
+	doubleTap.numberOfTapsRequired = 2;
+	[self.view addGestureRecognizer: doubleTap];
 
 }
 
@@ -250,6 +262,7 @@ static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 	dimmedView.alpha = 0;
 	dimmedView.frame = UIScreen.mainScreen.bounds;
 	dimmedView.backgroundColor = UIColor.blackColor;
+	dimmedView.userInteractionEnabled = NO;
 	[self addSubview: dimmedView];
 
 }
