@@ -47,6 +47,5 @@ SBHomeScreenViewController *hsVC = nil;
 
 UIView *dimmedView;
 _UIBackdropView *blurredView;
-NSLayoutConstraint *dockIconsCenterYConstraint;
 
 static UITapGestureRecognizer *doubleTap;
