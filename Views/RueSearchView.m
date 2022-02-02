@@ -47,7 +47,7 @@
 	self.rueSearchBar = [UISearchBar new];
 	self.rueSearchBar.delegate = self;
 	self.rueSearchBar.placeholder = @"Search";
-	self.rueSearchBar.keyboardType = UIKeyboardTypeURL;
+	self.rueSearchBar.keyboardType = UIKeyboardTypeWebSearch;
 	self.rueSearchBar.returnKeyType = UIReturnKeyDone;
 	self.rueSearchBar.backgroundImage = [UIImage new];
 	self.rueSearchBar.translatesAutoresizingMaskIntoConstraints = NO;
