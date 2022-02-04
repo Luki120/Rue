@@ -36,11 +36,20 @@ static void new_setupRue(SBDockView *self, SEL _cmd) {
 
 static void new_setupRueConstraints(SBDockView *self, SEL _cmd) {
 
+	NSString *format = [NSString stringWithFormat: @"The view: %@ and/or the superview: %@ was unexpectedly found unprepared for constraints. Ashie istg this is happening only on your cursed device, cope and update.", self, self.superview];
+
 	self.translatesAutoresizingMaskIntoConstraints = NO;
-	[self.bottomAnchor constraintEqualToAnchor: self.superview.bottomAnchor].active = YES;
-	[self.leadingAnchor constraintEqualToAnchor: self.superview.leadingAnchor].active = YES;
-	[self.trailingAnchor constraintEqualToAnchor: self.superview.trailingAnchor].active = YES;
-	[self.heightAnchor constraintEqualToConstant: self.dockHeight + 50].active = YES;
+
+	if(self.superview != nil) {
+
+		[self.bottomAnchor constraintEqualToAnchor: self.superview.bottomAnchor].active = YES;
+		[self.leadingAnchor constraintEqualToAnchor: self.superview.leadingAnchor].active = YES;
+		[self.trailingAnchor constraintEqualToAnchor: self.superview.trailingAnchor].active = YES;
+		[self.heightAnchor constraintEqualToConstant: self.dockHeight + 50].active = YES;
+
+	}
+
+	else [NSException raise:NSInternalInconsistencyException format:@"%@", format];
 
 	[RueSearchView sharedInstance].topAnchorConstraint.active = NO;
 	[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: self.topAnchor];
@@ -80,7 +89,7 @@ static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
 		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
 
 		blurredView.alpha = 0.85;
-		dimmedView.alpha = 0.60;
+		dimmedView.alpha = 0.45;
 		iconScrollView.alpha = 0.45;
 
 	} completion:^(BOOL finished) {
@@ -89,9 +98,7 @@ static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
 
 		for(UIView *subview in self.superview.subviews)
 
-			if(![subview isEqual:self])
-
-				subview.userInteractionEnabled = NO;
+			if(![subview isEqual:self]) subview.userInteractionEnabled = NO;
 
 	}];
 
@@ -115,9 +122,7 @@ static void new_keyboardWillHide(SBDockView *self, SEL _cmd) {
 
 		for(UIView *subview in self.superview.subviews)
 
-			if(![subview isEqual:self])
-
-				subview.userInteractionEnabled = YES;
+			if(![subview isEqual:self]) subview.userInteractionEnabled = YES;
 
 	}];
 
@@ -222,6 +227,12 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 	blurredView.blurRadiusSetOnce = NO;
 	[self.view insertSubview:blurredView atIndex:0];
 
+	dimmedView = [UIView new];
+	dimmedView.alpha = 0;
+	dimmedView.frame = UIScreen.mainScreen.bounds;
+	dimmedView.backgroundColor = UIColor.blackColor;
+	[self.view insertSubview:dimmedView atIndex:1];
+
 	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didDoubleTapHS)];
 	doubleTap.enabled = NO;
 	doubleTap.numberOfTapsRequired = 2;
@@ -257,16 +268,12 @@ static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 
 	iconScrollView = self;
 
-	dimmedView = [UIView new];
-	dimmedView.alpha = 0;
-	dimmedView.frame = UIScreen.mainScreen.bounds;
-	dimmedView.backgroundColor = UIColor.blackColor;
-	[self addSubview: dimmedView];
-
 }
 
 
 __attribute__((constructor)) static void init() {
+
+	if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return;
 
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(hitTest:withEvent:), (IMP) &overrideHitTestPointWithEvent, (IMP *) &origHitTestPointWithEvent);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(setBackgroundAlpha:), (IMP) &overrideSetBackgroundAlpha, (IMP *) &origSetBackgroundAlpha);
