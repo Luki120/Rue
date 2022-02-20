@@ -5,8 +5,9 @@
 @interface SBDockView : UIView
 @property (nonatomic, readonly) CGFloat dockHeight;
 - (void)setupRue;
-- (void)setupMisc;
+- (void)shouldHideRueSearchBarBackground;
 - (void)setupRueConstraints;
+- (void)setBackgroundAlpha:(CGFloat)alpha;
 @end
 
 
@@ -37,7 +38,6 @@
 @property (copy, nonatomic) NSString *_blurQuality;
 - (id)initWithFrame:(CGRect)arg1 autosizesToFitSuperview:(BOOL)arg2 settings:(id)arg3;
 @end
-
 
 // global
 
