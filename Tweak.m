@@ -21,6 +21,8 @@ static void crossDissolveViews() {
 
 }
 
+// ! Setup
+
 static void new_setupRue(SBDockView *self, SEL _cmd) {
 
 	loadShit();
@@ -28,28 +30,12 @@ static void new_setupRue(SBDockView *self, SEL _cmd) {
 	dockView = self; // get an instance of SBDockView
 
 	[self addSubview: [RueSearchView sharedInstance].rueSearchBar];
-
-	[self setupMisc];
+	[self shouldHideRueSearchBarBackground];
 	[self setupRueConstraints];
 
 }
 
 static void new_setupRueConstraints(SBDockView *self, SEL _cmd) {
-
-	NSString *format = [NSString stringWithFormat: @"The view: %@ and/or the superview: %@ was unexpectedly found unprepared for constraints. Ashie istg this is happening only on your cursed device, cope and update.", self, self.superview];
-
-	self.translatesAutoresizingMaskIntoConstraints = NO;
-
-	if(self.superview != nil) {
-
-		[self.bottomAnchor constraintEqualToAnchor: self.superview.bottomAnchor].active = YES;
-		[self.leadingAnchor constraintEqualToAnchor: self.superview.leadingAnchor].active = YES;
-		[self.trailingAnchor constraintEqualToAnchor: self.superview.trailingAnchor].active = YES;
-		[self.heightAnchor constraintEqualToConstant: self.dockHeight + 50].active = YES;
-
-	}
-
-	else [NSException raise:NSInternalInconsistencyException format:@"%@", format];
 
 	[RueSearchView sharedInstance].topAnchorConstraint.active = NO;
 	[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: self.topAnchor];
@@ -66,7 +52,7 @@ static void new_setupRueConstraints(SBDockView *self, SEL _cmd) {
 
 }
 
-static void new_setupMisc(SBDockView *self, SEL _cmd) {
+static void new_shouldHideRueSearchBarBackground(SBDockView *self, SEL _cmd) {
 
 	if(hideSearchBarBackground)
 
@@ -78,21 +64,32 @@ static void new_setupMisc(SBDockView *self, SEL _cmd) {
 
 }
 
-static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
-
-	UILayoutGuide *guide = self.superview.superview.superview.superview.superview.safeAreaLayoutGuide;
+static void transitionViews(SBDockView *self, SEL _cmd,
+	NSLayoutAnchor *topAnchor,
+	CGFloat blurredViewAlpha,
+	CGFloat dimmedViewAlpha,
+	CGFloat iconScrollViewAlpha,
+	void(^completion)(BOOL finished)) {
 
 	[UIView transitionWithView:self duration:0.5 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 
 		[RueSearchView sharedInstance].topAnchorConstraint.active = NO;
-		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: guide.topAnchor constant: 10];
+		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: topAnchor constant: 10];
 		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
 
-		blurredView.alpha = 0.85;
-		dimmedView.alpha = 0.45;
-		iconScrollView.alpha = 0.45;
+		blurredView.alpha = blurredViewAlpha;
+		dimmedView.alpha = dimmedViewAlpha;
+		iconScrollView.alpha = iconScrollViewAlpha;
 
-	} completion:^(BOOL finished) {
+	} completion: completion];
+
+}
+
+static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
+
+	UILayoutGuide *guide = self.superview.superview.superview.superview.superview.safeAreaLayoutGuide;
+
+	transitionViews(self, _cmd, guide.topAnchor, 0.85, 0.45, 0.45, ^(BOOL finished) {
 
 		doubleTap.enabled = YES;
 
@@ -100,23 +97,13 @@ static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
 
 			if(![subview isEqual:self]) subview.userInteractionEnabled = NO;
 
-	}];
+	});
 
 }
 
 static void new_keyboardWillHide(SBDockView *self, SEL _cmd) {
 
-	[UIView transitionWithView:self duration:0.5 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-
-		[RueSearchView sharedInstance].topAnchorConstraint.active = NO;
-		[RueSearchView sharedInstance].topAnchorConstraint = [[RueSearchView sharedInstance].rueSearchBar.topAnchor constraintEqualToAnchor: self.topAnchor constant: topConstant];
-		[RueSearchView sharedInstance].topAnchorConstraint.active = YES;
-
-		blurredView.alpha = 0;
-		dimmedView.alpha = 0;
-		iconScrollView.alpha = 1;
-
-	} completion:^(BOOL finished) {
+	transitionViews(self, _cmd, self.topAnchor, 0, 0, 1, ^(BOOL finished) {
 
 		doubleTap.enabled = NO;
 
@@ -124,47 +111,7 @@ static void new_keyboardWillHide(SBDockView *self, SEL _cmd) {
 
 			if(![subview isEqual:self]) subview.userInteractionEnabled = YES;
 
-	}];
-
-}
-
-static UIView *(*origHitTestPointWithEvent)(SBDockView *self, SEL _cmd, CGPoint, UIEvent *);
-
-static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint point, UIEvent *event) {
-
-	origHitTestPointWithEvent(self, _cmd, point, event);
-
-	// https://stackoverflow.com/a/14875673
-
-	/*--- allow touches to pass through even when
-	the subview it's outside the superview's bounds ---*/
-
-	if(self.clipsToBounds) return nil;
-
-	else if(self.hidden) return nil;
-
-	else if(self.alpha == 0) return nil;
-
-	for(UIView *subview in self.subviews.reverseObjectEnumerator) {
-
-		CGPoint subPoint = [subview convertPoint:point fromView:self];
-		UIView *result = [subview hitTest:subPoint withEvent:event];
-
-		if(result) return result;
-
-	}
-
-    return nil;
-
-}
-
-static void (*origSetBackgroundAlpha)(SBDockView *self, SEL _cmd, CGFloat);
-
-static void overrideSetBackgroundAlpha(SBDockView *self, SEL _cmd, CGFloat alpha) {
-
-	if(!hideDockBackground) return origSetBackgroundAlpha(self, _cmd, 1);
-
-	origSetBackgroundAlpha(self, _cmd, 0);
+	});
 
 }
 
@@ -173,7 +120,6 @@ static void (*origDMTS)(SBDockView *self, SEL _cmd);
 static void overrideDMTS(SBDockView *self, SEL _cmd) {
 
 	origDMTS(self, _cmd);
-
 	[self setupRue];
 
 	[NSNotificationCenter.defaultCenter removeObserver:self];
@@ -185,7 +131,6 @@ static void overrideDMTS(SBDockView *self, SEL _cmd) {
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setBackgroundAlpha:) name:@"hideDockBackgroundDone" object:nil];
 
 }
-
 
 static void new_setupDockConstraints(SBRootFolderDockIconListView *self, SEL _cmd) {
 
@@ -202,7 +147,6 @@ static void (*origDMTW)(SBRootFolderDockIconListView *self, SEL _cmd);
 static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 
 	origDMTW(self, _cmd);
-
 	[self setupDockConstraints];
 
 	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
@@ -210,6 +154,87 @@ static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 
 }
 
+// ! Misc
+
+static CGFloat (*origDockHeight)(SBDockView *self, SEL _cmd);
+
+static CGFloat overrideDockHeight(SBDockView *self, SEL _cmd) {
+
+	// lol, imagine not overriding readonly properties, thanks Apple for this one btw
+	return origDockHeight(self, _cmd) + 50;
+
+}
+
+static void (*origSetBackgroundAlpha)(SBDockView *self, SEL _cmd, CGFloat);
+
+static void overrideSetBackgroundAlpha(SBDockView *self, SEL _cmd, CGFloat alpha) {
+
+	if(!hideDockBackground) return origSetBackgroundAlpha(self, _cmd, alpha);
+
+	origSetBackgroundAlpha(self, _cmd, 0);
+
+}
+
+static void (*origTCDC)(UIScreen *self, SEL _cmd, id);
+
+static void overrideTCDC(UIScreen *self, SEL _cmd, id previousTrait) {
+
+	origTCDC(self, _cmd, previousTrait);
+
+	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"hideDockBackgroundDone" object:nil];
+
+}
+
+static UIView *(*origHitTestPointWithEvent)(SBDockView *self, SEL _cmd, CGPoint, UIEvent *);
+
+static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint point, UIEvent *event) {
+
+	origHitTestPointWithEvent(self, _cmd, point, event);
+
+	// https://stackoverflow.com/a/14875673
+
+	/*--- allow touches to pass through even when
+	the subview it's outside the superview's bounds ---*/
+
+	if(self.clipsToBounds) return nil;
+	else if(self.hidden) return nil;
+	else if(self.alpha == 0) return nil;
+
+	for(UIView *subview in self.subviews.reverseObjectEnumerator) {
+
+		CGPoint subPoint = [subview convertPoint:point fromView:self];
+		UIView *result = [subview hitTest:subPoint withEvent:event];
+
+		if(result) return result;
+
+	}
+
+    return nil;
+
+}
+
+static void (*origSinglePressUp)(SBHomeHardwareButton *self, SEL _cmd, id);
+
+static void overrideSinglePressUp(SBHomeHardwareButton *self, SEL _cmd, id pressUp) {
+
+	origSinglePressUp(self, _cmd, pressUp);
+
+	if([RueSearchView sharedInstance].rueSearchBar.window == nil) return;
+
+	crossDissolveViews();
+
+}
+
+static void (*origIconScrollViewDMTS)(SBIconScrollView *self, SEL _cmd);
+
+static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
+
+	origIconScrollViewDMTS(self, _cmd);
+	iconScrollView = self; // get an instance of SBIconScrollView
+
+}
+
+// ! Blur, dim & gesture
 
 static void (*origVDL)(SBHomeScreenViewController *self, SEL _cmd);
 
@@ -217,7 +242,7 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 
 	origVDL(self, _cmd);
 
-	hsVC = self;
+	hsVC = self; // get an instance of SBHomeScreenViewController
 
 	_UIBackdropViewSettings *settings = [_UIBackdropViewSettings settingsForStyle:2];
 
@@ -247,46 +272,23 @@ static void new_didDoubleTapHS(SBHomeScreenViewController *self, SEL _cmd) {
 }
 
 
-static void (*origSinglePressUp)(SBHomeHardwareButton *self, SEL _cmd, id);
-
-static void overrideSinglePressUp(SBHomeHardwareButton *self, SEL _cmd, id pressUp) {
-
-	origSinglePressUp(self, _cmd, pressUp);
-
-	if([RueSearchView sharedInstance].rueSearchBar.window == nil) return;
-
-	crossDissolveViews();
-
-}
-
-
-static void (*origIconScrollViewDMTS)(SBIconScrollView *self, SEL _cmd);
-
-static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
-
-	origIconScrollViewDMTS(self, _cmd);
-
-	iconScrollView = self;
-
-}
-
-
 __attribute__((constructor)) static void init() {
 
 	if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return;
 
-	MSHookMessageEx(kClass(@"SBDockView"), @selector(hitTest:withEvent:), (IMP) &overrideHitTestPointWithEvent, (IMP *) &origHitTestPointWithEvent);
-	MSHookMessageEx(kClass(@"SBDockView"), @selector(setBackgroundAlpha:), (IMP) &overrideSetBackgroundAlpha, (IMP *) &origSetBackgroundAlpha);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(didMoveToSuperview), (IMP) &overrideDMTS, (IMP *) &origDMTS);
-
+	MSHookMessageEx(kClass(@"SBDockView"), @selector(dockHeight), (IMP) &overrideDockHeight, (IMP *) &origDockHeight);
+	MSHookMessageEx(kClass(@"SBDockView"), @selector(setBackgroundAlpha:), (IMP) &overrideSetBackgroundAlpha, (IMP *) &origSetBackgroundAlpha);
+	MSHookMessageEx(kClass(@"SBDockView"), @selector(hitTest:withEvent:), (IMP) &overrideHitTestPointWithEvent, (IMP *) &origHitTestPointWithEvent);
+	MSHookMessageEx(kClass(@"UIScreen"), @selector(traitCollectionDidChange:), (IMP) &overrideTCDC, (IMP *) &origTCDC);
 	MSHookMessageEx(kClass(@"SBRootFolderDockIconListView"), @selector(didMoveToWindow), (IMP) &overrideDMTW, (IMP *) &origDMTW);
-	MSHookMessageEx(kClass(@"SBHomeScreenViewController"), @selector(viewDidLoad), (IMP) &overrideVDL, (IMP *) &origVDL);
 	MSHookMessageEx(kClass(@"SBHomeHardwareButton"), @selector(singlePressUp:), (IMP) &overrideSinglePressUp, (IMP *) &origSinglePressUp);
 	MSHookMessageEx(kClass(@"SBIconScrollView"), @selector(didMoveToSuperview), (IMP) &overrideIconScrollViewDMTS, (IMP *) &origIconScrollViewDMTS);
+	MSHookMessageEx(kClass(@"SBHomeScreenViewController"), @selector(viewDidLoad), (IMP) &overrideVDL, (IMP *) &origVDL);
 
 	class_addMethod(kClass(@"SBDockView"), @selector(setupRue), (IMP) &new_setupRue, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(setupRueConstraints), (IMP) &new_setupRueConstraints, "v@:");
-	class_addMethod(kClass(@"SBDockView"), @selector(setupMisc), (IMP)&new_setupMisc, "v@:");
+	class_addMethod(kClass(@"SBDockView"), @selector(shouldHideRueSearchBarBackground), (IMP)&new_shouldHideRueSearchBarBackground, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillShow), (IMP) &new_keyboardWillShow, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillHide), (IMP) &new_keyboardWillHide, "v@:");
 	class_addMethod(kClass(@"SBRootFolderDockIconListView"), @selector(setupDockConstraints), (IMP) &new_setupDockConstraints, "v@:");
