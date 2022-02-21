@@ -169,7 +169,7 @@ static void (*origSetBackgroundAlpha)(SBDockView *self, SEL _cmd, CGFloat);
 
 static void overrideSetBackgroundAlpha(SBDockView *self, SEL _cmd, CGFloat alpha) {
 
-	if(!hideDockBackground) return origSetBackgroundAlpha(self, _cmd, alpha);
+	if(!hideDockBackground) return origSetBackgroundAlpha(self, _cmd, 1);
 
 	origSetBackgroundAlpha(self, _cmd, 0);
 
