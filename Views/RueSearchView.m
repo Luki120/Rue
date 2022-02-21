@@ -26,14 +26,12 @@
 
 	self = [super init];
 
-	if(self) {
+	if(!self) return nil;
 
-		[self setupRueSearchBar];
+	[self setupRueSearchBar];
 
-		[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
-		[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:@"chooseSearchEngineDone" object:nil];
-
-	}
+	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:@"chooseSearchEngineDone" object:nil];
 
 	return self;
 
@@ -61,45 +59,14 @@
 
 	switch(searchEngineType) {
 
-		case 0:
-
-			[self setupSearchEngineWithEngine: kBingEngine];
-			break;
-
-		case 1:
-
-			[self setupSearchEngineWithEngine: kDuckDuckGoEngine];
-			break;
-
-		case 2:
-
-			[self setupSearchEngineWithEngine: kEcosiaEngine];
-			break;
-
-		case 3:
-
-			[self setupSearchEngineWithEngine: kGoogleEngine];
-			break;
-
-		case 4:
-
-			[self setupSearchEngineWithEngine: kSearXEngine];
-			break;
-
-		case 5:
-
-			[self setupSearchEngineWithEngine: kYahooEngine];
-			break;
-
-		case 6:
-
-			[self setupSearchEngineWithEngine: kYandexEngine];
-			break;
-
-		case 7:
-
-			[self setupSearchEngineWithEngine: kYouTubeEngine];
-			break;
+		case 0: [self setupSearchEngineWithEngine: kBingEngine]; break;
+		case 1: [self setupSearchEngineWithEngine: kDuckDuckGoEngine]; break;
+		case 2: [self setupSearchEngineWithEngine: kEcosiaEngine]; break;
+		case 3: [self setupSearchEngineWithEngine: kGoogleEngine]; break;
+		case 4: [self setupSearchEngineWithEngine: kSearXEngine]; break;
+		case 5: [self setupSearchEngineWithEngine: kYahooEngine]; break;
+		case 6: [self setupSearchEngineWithEngine: kYandexEngine]; break;
+		case 7: [self setupSearchEngineWithEngine: kYouTubeEngine]; break;
 
 	}
 
@@ -113,7 +80,7 @@
 }
 
 
-- (void)setupURLTypesFor:(UISearchBar *)rueSearchBar {
+- (void)setupURLTypesForSearchBar:(UISearchBar *)rueSearchBar {
 
 	httpURLString = [NSString stringWithFormat:@"%@", rueSearchBar.text];
 	vanillaURLString = [NSString stringWithFormat:@"https://%@", rueSearchBar.text];
@@ -138,7 +105,7 @@
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
 
 	[self setupSearchEngine];
-	[self setupURLTypesFor: searchBar];
+	[self setupURLTypesForSearchBar: searchBar];
 
 	[searchBar resignFirstResponder];
 
@@ -163,6 +130,5 @@
 	return YES;
 
 }
-
 
 @end
