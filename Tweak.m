@@ -258,14 +258,14 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 	dimmedView.backgroundColor = UIColor.blackColor;
 	[self.view insertSubview:dimmedView atIndex:1];
 
-	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didDoubleTapHS)];
+	doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(rue_didDoubleTap)];
 	doubleTap.enabled = NO;
 	doubleTap.numberOfTapsRequired = 2;
 	[self.view addGestureRecognizer: doubleTap];
 
 }
 
-static void new_didDoubleTapHS(SBHomeScreenViewController *self, SEL _cmd) {
+static void new_rue_didDoubleTap(SBHomeScreenViewController *self, SEL _cmd) {
 
 	crossDissolveViews();
 
@@ -292,6 +292,6 @@ __attribute__((constructor)) static void init() {
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillShow), (IMP) &new_keyboardWillShow, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillHide), (IMP) &new_keyboardWillHide, "v@:");
 	class_addMethod(kClass(@"SBRootFolderDockIconListView"), @selector(setupDockConstraints), (IMP) &new_setupDockConstraints, "v@:");
-	class_addMethod(kClass(@"SBHomeScreenViewController"), @selector(didDoubleTapHS), (IMP) &new_didDoubleTapHS, "v@:");
+	class_addMethod(kClass(@"SBHomeScreenViewController"), @selector(rue_didDoubleTap), (IMP) &new_rue_didDoubleTap, "v@:");
 
 }
