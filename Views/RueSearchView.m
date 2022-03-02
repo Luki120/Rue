@@ -10,18 +10,6 @@
 }
 
 
-+ (RueSearchView *)sharedInstance {
-
-	static RueSearchView *sharedInstance = nil;
-	static dispatch_once_t onceToken;
-
-	dispatch_once(&onceToken, ^{ sharedInstance = [self new]; });
-
-	return sharedInstance;
-
-}
-
-
 - (id)init {
 
 	self = [super init];
@@ -40,6 +28,8 @@
 
 - (void)setupRueSearchBar {
 
+	self.translatesAutoresizingMaskIntoConstraints = NO;
+
 	if(self.rueSearchBar) return;
 
 	self.rueSearchBar = [UISearchBar new];
@@ -47,8 +37,25 @@
 	self.rueSearchBar.placeholder = @"Search";
 	self.rueSearchBar.keyboardType = UIKeyboardTypeWebSearch;
 	self.rueSearchBar.returnKeyType = UIReturnKeyDone;
+	self.rueSearchBar.clipsToBounds = YES;
 	self.rueSearchBar.backgroundImage = [UIImage new];
 	self.rueSearchBar.translatesAutoresizingMaskIntoConstraints = NO;
+	[self addSubview: self.rueSearchBar];
+
+	[self layoutRueSearchBar];
+
+}
+
+
+- (void)layoutRueSearchBar {
+
+	NSDictionary *dict = @{ @"rueSearchBar": self.rueSearchBar };
+
+	NSString *formatTopBottom = @"V:|-[rueSearchBar]-|";
+	NSString *formatLeadingTrailing = @"H:|-[rueSearchBar]-|";
+
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatTopBottom options:0 metrics:nil views:dict]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatLeadingTrailing options:0 metrics:nil views:dict]];
 
 }
 
@@ -117,7 +124,6 @@
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
 
 	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeInNow" object:nil];
-
 	return YES;
 
 }
@@ -126,7 +132,6 @@
 - (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
 
 	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeOutNow" object:nil];
-
 	return YES;
 
 }

@@ -7,5 +7,4 @@
 @property (nonatomic, strong) UISearchBar *rueSearchBar;
 @property (nonatomic, strong) NSLayoutConstraint *topAnchorConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *widthAnchorConstraint;
-+ (RueSearchView *)sharedInstance;
 @end
