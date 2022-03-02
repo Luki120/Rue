@@ -286,6 +286,6 @@ __attribute__((constructor)) static void init() {
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillHide), (IMP) &new_keyboardWillHide, "v@:");
 	class_addMethod(kClass(@"SBRootFolderDockIconListView"), @selector(setupDockConstraints), (IMP) &new_setupDockConstraints, "v@:");
 	class_addMethod(kClass(@"SBHomeScreenViewController"), @selector(rue_didDoubleTap), (IMP) &new_rue_didDoubleTap, "v@:");
-	class_addMethod(kClass(@"SBIconScrollView"), @selector(dimIcons:), (IMP) &new_dimIcons, "v@:");
+	class_addMethod(kClass(@"SBIconScrollView"), @selector(dimIcons:), (IMP) &new_dimIcons, "v@:@");
 
 }
