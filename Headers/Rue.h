@@ -1,5 +1,6 @@
 @import UIKit;
 #import <substrate.h>
+#import "Views/RueSearchView.h"
 
 
 @interface SBDockView : UIView
@@ -41,11 +42,8 @@
 
 // global
 
-SBDockView *dockView = nil;
-SBIconScrollView *iconScrollView = nil;
-SBHomeScreenViewController *hsVC = nil;
-
-UIView *dimmedView;
 _UIBackdropView *blurredView;
+RueSearchView *rueSearchView;
+UIView *dimmedView;
 
 static UITapGestureRecognizer *doubleTap;
