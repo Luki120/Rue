@@ -13,7 +13,6 @@
 - (id)init {
 
 	self = [super init];
-
 	if(!self) return nil;
 
 	[self setupRueSearchBar];
@@ -65,7 +64,6 @@
 	loadShit();
 
 	switch(searchEngineType) {
-
 		case 0: [self setupSearchEngineWithEngine: kBingEngine]; break;
 		case 1: [self setupSearchEngineWithEngine: kDuckDuckGoEngine]; break;
 		case 2: [self setupSearchEngineWithEngine: kEcosiaEngine]; break;
@@ -74,7 +72,6 @@
 		case 5: [self setupSearchEngineWithEngine: kYahooEngine]; break;
 		case 6: [self setupSearchEngineWithEngine: kYandexEngine]; break;
 		case 7: [self setupSearchEngineWithEngine: kYouTubeEngine]; break;
-
 	}
 
 }
