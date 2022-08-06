@@ -6,7 +6,6 @@ TWEAK_NAME = Rue
 
 Rue_FILES = Tweak.m Views/RueSearchView.m
 Rue_CFLAGS = -fobjc-arc
-RUE_LIBRARIES = gcuniversal
 
 SUBPROJECTS = RuePrefs
 
