@@ -1,4 +1,4 @@
-@import Foundation;
+@import UIKit;
 
 
 static NSString *const kPath = @"/var/mobile/Library/Preferences/me.luki.rueprefs.plist";

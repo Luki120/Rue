@@ -1,5 +1,4 @@
-@import UIKit;
-#import <substrate.h>
+@import CydiaSubstrate;
 #import "Views/RueSearchView.h"
 
 
