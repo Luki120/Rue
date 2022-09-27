@@ -1,5 +1,4 @@
 #import "Headers/Prefs.h"
-#import "Headers/Headers.h"
 
 
 @interface RueSearchView: UIView <UISearchBarDelegate>

@@ -1,5 +1,5 @@
-#import "Constants.h"
-
+@import UIKit;
+#import "Common.h"
 
 static BOOL hideDockBackground;
 static BOOL hideSearchBarBackground;

@@ -5,9 +5,7 @@
 @interface SBDockView : UIView
 @property (nonatomic, readonly) CGFloat dockHeight;
 - (void)setupRue;
-- (void)shouldHideRueSearchBarBackground;
 - (void)setupRueConstraints;
-- (void)setBackgroundAlpha:(CGFloat)alpha;
 @end
 
 
@@ -41,8 +39,10 @@
 
 // global
 
-_UIBackdropView *blurredView;
-RueSearchView *rueSearchView;
-UIView *dimmedView;
+static _UIBackdropView *blurredView;
+static RueSearchView *rueSearchView;
+static UIView *dimmedView;
 
 static UITapGestureRecognizer *doubleTap;
+
+#define kClass(class) NSClassFromString(class)
