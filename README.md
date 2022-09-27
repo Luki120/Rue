@@ -1,6 +1,6 @@
 # Rue
 
-![Rue](https://i.imgur.com/wODRj2G.jpeg)
+<img src="https://i.imgur.com/wODRj2G.jpeg" width="300">
 
 ## Search across the internet from your dock and customize it on the fly
 
@@ -25,7 +25,6 @@
 ## Socials
 
 * [Twitter](https://twitter.com/Lukii120)
-* [Support on Discord](https://discord.gg/pKekktctUK)
 
 ## Contributing
 
@@ -37,9 +36,9 @@
 
 ## LICENSE
 
-* If you use code from this repository you agree to linking the GitHub project and/or my twitter in your project.
+* If you use code from this repository you're agreeing to link the GitHub project and/or my twitter in your project.
 * **IT'S FORBIDDEN** the redistribution of this source code or packages from it, it's only meant for **EDUCATIONAL PURPOSES.**
-* **IT'S FORBIDDEN** the usage of this project to make profit out it, no matter the kind.
+* **IT'S FORBIDDEN** the usage of this project to make profit out of it, no matter the kind.
 
 ## Assets LICENSE
 
