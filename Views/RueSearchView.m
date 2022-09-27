@@ -9,6 +9,16 @@
 
 }
 
+static NSString *const kBingEngine = @"https://www.bing.com/search?q=";
+static NSString *const kDuckDuckGoEngine = @"https://duckduckgo.com/?q=";
+static NSString *const kEcosiaEngine = @"https://www.ecosia.org/search?q=";
+static NSString *const kGoogleEngine = @"https://www.google.com/search?q=";
+static NSString *const kSearXEngine = @"https://searx.org/search?q=";
+static NSString *const kYahooEngine = @"https://search.yahoo.com/search?q=";
+static NSString *const kYandexEngine = @"https://yandex.com/search/?text=";
+static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search_query=";
+
+#define kStockColor [UIColor.systemGrayColor colorWithAlphaComponent: 0.24]
 
 - (id)init {
 
@@ -19,6 +29,7 @@
 
 	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:@"chooseSearchEngineDone" object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(hideRueSearchBarBackground) name:@"hideRueSearchBarBackgroundDone" object:nil];
 
 	return self;
 
@@ -38,10 +49,12 @@
 	self.rueSearchBar.returnKeyType = UIReturnKeyDone;
 	self.rueSearchBar.clipsToBounds = YES;
 	self.rueSearchBar.backgroundImage = [UIImage new];
+	self.rueSearchBar.searchTextField.backgroundColor = hideSearchBarBackground ? UIColor.clearColor : kStockColor;
 	self.rueSearchBar.translatesAutoresizingMaskIntoConstraints = NO;
 	[self addSubview: self.rueSearchBar];
 
 	[self layoutRueSearchBar];
+	[self hideRueSearchBarBackground];
 
 }
 
@@ -50,11 +63,21 @@
 
 	NSDictionary *dict = @{ @"rueSearchBar": self.rueSearchBar };
 
-	NSString *formatTopBottom = @"V:|-[rueSearchBar]-|";
-	NSString *formatLeadingTrailing = @"H:|-[rueSearchBar]-|";
+	NSString *formatTop = @"V:|-[rueSearchBar]";
+	NSString *formatHeight = @"V:[rueSearchBar(==50)]";
+	NSString *formatLeadingTrailing = @"H:|-15-[rueSearchBar]-15-|";
 
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatTopBottom options:0 metrics:nil views:dict]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatTop options:0 metrics:nil views:dict]];
+	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatHeight options:0 metrics:nil views:dict]];
 	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatLeadingTrailing options:0 metrics:nil views:dict]];
+
+}
+
+
+- (void)hideRueSearchBarBackground {
+
+	loadShit();
+	self.rueSearchBar.searchTextField.backgroundColor = hideSearchBarBackground ? UIColor.clearColor : kStockColor;
 
 }
 
@@ -62,7 +85,6 @@
 - (void)setupSearchEngine {
 
 	loadShit();
-
 	switch(searchEngineType) {
 		case 0: [self setupSearchEngineWithEngine: kBingEngine]; break;
 		case 1: [self setupSearchEngineWithEngine: kDuckDuckGoEngine]; break;

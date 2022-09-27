@@ -1,6 +1,5 @@
 #import "Headers/Rue.h"
 
-
 // ! Setup
 
 static void new_setupRue(SBDockView *self, SEL _cmd) {
@@ -10,7 +9,6 @@ static void new_setupRue(SBDockView *self, SEL _cmd) {
 	if(!rueSearchView) rueSearchView = [RueSearchView new];
 	if(![rueSearchView isDescendantOfView: self]) [self addSubview: rueSearchView];
 
-	[self shouldHideRueSearchBarBackground];
 	[self setupRueConstraints];
 
 }
@@ -18,29 +16,15 @@ static void new_setupRue(SBDockView *self, SEL _cmd) {
 static void new_setupRueConstraints(SBDockView *self, SEL _cmd) {
 
 	rueSearchView.topAnchorConstraint.active = NO;
-	rueSearchView.topAnchorConstraint = [rueSearchView.topAnchor constraintEqualToAnchor: self.topAnchor];
-	rueSearchView.topAnchorConstraint.constant = topConstant;
+	rueSearchView.topAnchorConstraint = [rueSearchView.topAnchor constraintEqualToAnchor:self.topAnchor constant: topConstant];
 	rueSearchView.topAnchorConstraint.active = YES;
 
-	[rueSearchView.rueSearchBar.centerXAnchor constraintEqualToAnchor: self.centerXAnchor].active = YES;
+	[rueSearchView.centerXAnchor constraintEqualToAnchor: self.centerXAnchor].active = YES;
+	[rueSearchView.heightAnchor constraintEqualToConstant: 50].active = YES;
 
 	rueSearchView.widthAnchorConstraint.active = NO;
 	rueSearchView.widthAnchorConstraint = [rueSearchView.widthAnchor constraintEqualToConstant: widthConstant];
 	rueSearchView.widthAnchorConstraint.active = YES;
-
-	[rueSearchView.rueSearchBar.heightAnchor constraintEqualToConstant: 50].active = YES;
-
-}
-
-static void new_shouldHideRueSearchBarBackground(SBDockView *self, SEL _cmd) {
-
-	if(hideSearchBarBackground)
-
-		rueSearchView.rueSearchBar.searchTextField.backgroundColor = UIColor.clearColor;
-
-	else
-
-		rueSearchView.rueSearchBar.searchTextField.backgroundColor = [UIColor.systemGrayColor colorWithAlphaComponent: 0.24];
 
 }
 
@@ -57,7 +41,7 @@ static void transitionViews(SBDockView *self, SEL _cmd,
 	[UIView transitionWithView:rueSearchView duration:0.5 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
 
 		rueSearchView.topAnchorConstraint.active = NO;
-		rueSearchView.topAnchorConstraint = [rueSearchView.topAnchor constraintEqualToAnchor: topAnchor constant: constraintConstant];
+		rueSearchView.topAnchorConstraint = [rueSearchView.topAnchor constraintEqualToAnchor:topAnchor constant: constraintConstant];
 		rueSearchView.topAnchorConstraint.active = YES;
 
 		blurredView.alpha = blurredViewAlpha;
@@ -102,8 +86,7 @@ static void new_keyboardWillHide(SBDockView *self, SEL _cmd) {
 
 }
 
-static void (*origDMTS)(SBDockView *self, SEL _cmd);
-
+static void (*origDMTS)(SBDockView *, SEL);
 static void overrideDMTS(SBDockView *self, SEL _cmd) {
 
 	origDMTS(self, _cmd);
@@ -129,8 +112,7 @@ static void new_setupDockConstraints(SBRootFolderDockIconListView *self, SEL _cm
 
 }
 
-static void (*origDMTW)(SBRootFolderDockIconListView *self, SEL _cmd);
-
+static void (*origDMTW)(SBRootFolderDockIconListView *, SEL);
 static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 
 	origDMTW(self, _cmd);
@@ -143,8 +125,7 @@ static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 
 // ! Misc
 
-static CGFloat (*origDockHeight)(SBDockView *self, SEL _cmd);
-
+static CGFloat (*origDockHeight)(SBDockView *, SEL);
 static CGFloat overrideDockHeight(SBDockView *self, SEL _cmd) {
 
 	// lol, imagine not overriding readonly properties, thanks Apple for this one btw
@@ -152,28 +133,23 @@ static CGFloat overrideDockHeight(SBDockView *self, SEL _cmd) {
 
 }
 
-static void (*origSetBackgroundAlpha)(SBDockView *self, SEL _cmd, CGFloat);
-
+static void (*origSetBackgroundAlpha)(SBDockView *, SEL, CGFloat);
 static void overrideSetBackgroundAlpha(SBDockView *self, SEL _cmd, CGFloat alpha) {
 
 	if(!hideDockBackground) return origSetBackgroundAlpha(self, _cmd, 1);
-
 	origSetBackgroundAlpha(self, _cmd, 0);
 
 }
 
-static void (*origTCDC)(UIScreen *self, SEL _cmd, id);
-
-static void overrideTCDC(UIScreen *self, SEL _cmd, id previousTrait) {
+static void (*origTCDC)(UIScreen *, SEL, UITraitCollection *);
+static void overrideTCDC(UIScreen *self, SEL _cmd, UITraitCollection *previousTrait) {
 
 	origTCDC(self, _cmd, previousTrait);
-
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:@"hideDockBackgroundDone" object:nil];
 
 }
 
-static UIView *(*origHitTestPointWithEvent)(SBDockView *self, SEL _cmd, CGPoint, UIEvent *);
-
+static UIView *(*origHitTestPointWithEvent)(SBDockView *, SEL, CGPoint, UIEvent *);
 static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint point, UIEvent *event) {
 
 	origHitTestPointWithEvent(self, _cmd, point, event);
@@ -200,8 +176,7 @@ static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint
 
 }
 
-static void (*origSinglePressUp)(SBHomeHardwareButton *self, SEL _cmd, id);
-
+static void (*origSinglePressUp)(SBHomeHardwareButton *, SEL, id);
 static void overrideSinglePressUp(SBHomeHardwareButton *self, SEL _cmd, id pressUp) {
 
 	origSinglePressUp(self, _cmd, pressUp);
@@ -211,8 +186,7 @@ static void overrideSinglePressUp(SBHomeHardwareButton *self, SEL _cmd, id press
 
 }
 
-static void (*origIconScrollViewDMTS)(SBIconScrollView *self, SEL _cmd);
-
+static void (*origIconScrollViewDMTS)(SBIconScrollView *, SEL);
 static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 
 	origIconScrollViewDMTS(self, _cmd);
@@ -225,14 +199,13 @@ static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 
 static void new_dimIcons(SBIconScrollView *self, SEL _cmd, NSNotification *notification) {
 
-	[notification.name isEqual: @"dimIconsNow"] ? (self.alpha = 0.45) : (self.alpha = 1);
+	self.alpha = [notification.name isEqualToString: @"dimIconsNow"] ? 0.45 : 1;
 
 }
 
 // ! Blur, dim & gesture
 
-static void (*origVDL)(SBHomeScreenViewController *self, SEL _cmd);
-
+static void (*origVDL)(SBHomeScreenViewController *, SEL);
 static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 
 	origVDL(self, _cmd);
@@ -281,7 +254,6 @@ __attribute__((constructor)) static void init() {
 
 	class_addMethod(kClass(@"SBDockView"), @selector(setupRue), (IMP) &new_setupRue, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(setupRueConstraints), (IMP) &new_setupRueConstraints, "v@:");
-	class_addMethod(kClass(@"SBDockView"), @selector(shouldHideRueSearchBarBackground), (IMP)&new_shouldHideRueSearchBarBackground, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillShow), (IMP) &new_keyboardWillShow, "v@:");
 	class_addMethod(kClass(@"SBDockView"), @selector(keyboardWillHide), (IMP) &new_keyboardWillHide, "v@:");
 	class_addMethod(kClass(@"SBRootFolderDockIconListView"), @selector(setupDockConstraints), (IMP) &new_setupDockConstraints, "v@:");
