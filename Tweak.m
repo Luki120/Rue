@@ -92,11 +92,9 @@ static void overrideDMTS(SBDockView *self, SEL _cmd) {
 	origDMTS(self, _cmd);
 	[self setupRue];
 
-	[NSNotificationCenter.defaultCenter removeObserver:self];
 	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow) name:@"fadeInNow" object:nil];
 	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide) name:@"fadeOutNow" object:nil];
 
-	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupRue) name:@"rueSetupDone" object:nil];
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setBackgroundAlpha:) name:@"hideDockBackgroundDone" object:nil];
 
@@ -118,7 +116,6 @@ static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 	origDMTW(self, _cmd);
 	[self setupDockConstraints];
 
-	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupDockConstraints) name:@"rueSetupDone" object:nil];
 
 }
@@ -172,7 +169,7 @@ static UIView *overrideHitTestPointWithEvent(SBDockView *self, SEL _cmd, CGPoint
 
 	}
 
-    return nil;
+	return nil;
 
 }
 
@@ -191,7 +188,6 @@ static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
 
 	origIconScrollViewDMTS(self, _cmd);
 
-	[NSNotificationCenter.defaultCenter removeObserver:self name:@"dimIconsNow" object:nil];
 	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(dimIcons:) name:@"dimIconsNow" object:nil];
 	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(dimIcons:) name:@"undimIconsNow" object:nil];
 
