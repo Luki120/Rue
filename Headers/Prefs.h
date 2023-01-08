@@ -1,4 +1,3 @@
-@import UIKit;
 #import "Common.h"
 
 static BOOL hideDockBackground;
