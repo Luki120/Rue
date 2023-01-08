@@ -236,8 +236,6 @@ static void new_rue_didDoubleTap(SBHomeScreenViewController *self, SEL _cmd) {
 
 __attribute__((constructor)) static void init() {
 
-	if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) return;
-
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(didMoveToSuperview), (IMP) &overrideDMTS, (IMP *) &origDMTS);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(dockHeight), (IMP) &overrideDockHeight, (IMP *) &origDockHeight);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(setBackgroundAlpha:), (IMP) &overrideSetBackgroundAlpha, (IMP *) &origSetBackgroundAlpha);
