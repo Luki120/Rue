@@ -32,17 +32,5 @@
 
 
 @interface _UIBackdropView : UIView
-@property (assign, nonatomic) BOOL blurRadiusSetOnce;
-@property (copy, nonatomic) NSString *_blurQuality;
 - (id)initWithFrame:(CGRect)arg1 autosizesToFitSuperview:(BOOL)arg2 settings:(id)arg3;
 @end
-
-// global
-
-static _UIBackdropView *blurredView;
-static RueSearchView *rueSearchView;
-static UIView *dimmedView;
-
-static UITapGestureRecognizer *doubleTap;
-
-#define kClass(class) NSClassFromString(class)

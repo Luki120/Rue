@@ -27,9 +27,8 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 	[self setupRueSearchBar];
 
-	[NSDistributedNotificationCenter.defaultCenter removeObserver:self];
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:@"chooseSearchEngineDone" object:nil];
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(hideRueSearchBarBackground) name:@"hideRueSearchBarBackgroundDone" object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:RueSetupSearchEngineNotification object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(hideRueSearchBarBackground) name:RueHideSearchBarBackgroundNotification object:nil];
 
 	return self;
 
@@ -142,7 +141,7 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
 
-	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeInNow" object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeInSubviewsNotification object:nil];
 	return YES;
 
 }
@@ -150,7 +149,7 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 - (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
 
-	[NSNotificationCenter.defaultCenter postNotificationName:@"fadeOutNow" object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeOutSubviewsNotification object:nil];
 	return YES;
 
 }
