@@ -12,18 +12,6 @@
 		</dict>
 		<dict>
 			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>cellClass</key>
-			<string>GcTwitterCell</string>
-			<key>accountLabel</key>
-			<string>Luki120</string>
-			<key>account</key>
-			<string>Lukii120</string>
-			<key>URL</key>
-			<string>https://avatars.githubusercontent.com/u/74214115?v=4</string>
-		</dict>
-		<dict>
-			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Y position</string>

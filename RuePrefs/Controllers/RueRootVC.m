@@ -1,13 +1,27 @@
 #import "RueRootVC.h"
 
 
+static LukiTwitterCell *cell;
+
 #define kRueTintColor [UIColor colorWithRed:0.74 green:0.45 blue:0.83 alpha: 1.0];
+
+@interface RueRootVC () <LukiTwitterCellDelegate>
+@end
 
 @implementation RueRootVC
 
+// ! Lifecycle
+
 - (NSArray *)specifiers {
 
-	if(!_specifiers) _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+	if(_specifiers) return _specifiers;
+	_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+
+	PSSpecifier *lukiTwitterCellSpecifier = [PSSpecifier preferenceSpecifierNamed:nil target:self set:nil get:nil detail:nil cell:PSButtonCell edit:nil];
+	lukiTwitterCellSpecifier->action = @selector(didTapLukiTwitterCell);
+	[lukiTwitterCellSpecifier setProperty:[LukiTwitterCell class] forKey:@"cellClass"];
+	[_specifiers insertObject:lukiTwitterCellSpecifier atIndex:1];
+
 	return _specifiers;
 
 }
@@ -28,6 +42,32 @@
 
 }
 
+// ! Selectors
+
+- (void)didTapLukiTwitterCell {
+
+	[UIApplication.sharedApplication openURL:cell->accountURL options:@{} completionHandler:nil];
+
+}
+
+// ! UITableViewDataSource
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	if(indexPath.section != 0) return [super tableView:tableView cellForRowAtIndexPath: indexPath];
+
+	switch(indexPath.row) {
+		case 0:
+			cell = (LukiTwitterCell *)[super tableView:tableView cellForRowAtIndexPath: indexPath];
+			if([cell isKindOfClass: [LukiTwitterCell class]]) cell->delegate = self;
+			return cell;
+
+		default: return [super tableView:tableView cellForRowAtIndexPath: indexPath];
+	}
+
+}
+
+// ! Preferences
 
 - (id)readPreferenceValue:(PSSpecifier *)specifier {
 
@@ -51,6 +91,14 @@
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueSetupSearchEngineNotification object:nil];
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueHideDockBackgroundNotification object:nil];
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueHideSearchBarBackgroundNotification object:nil];
+
+}
+
+// ! LukiTwitterCellDelegate
+
+- (void)lukiTwitterCellShouldPresentAlertController:(UIViewController *)controller {
+
+	[self presentViewController:controller animated:YES completion:nil];
 
 }
 
