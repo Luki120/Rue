@@ -161,11 +161,15 @@ static void overrideSetBackgroundAlpha(SBDockView *self, SEL _cmd, CGFloat alpha
 
 }
 
-static void (*origTCDC)(UIScreen *, SEL, UITraitCollection *);
-static void overrideTCDC(UIScreen *self, SEL _cmd, UITraitCollection *previousTrait) {
+static void (*origTCDC)(SBDockView *, SEL, UITraitCollection *);
+static void overrideTCDC(SBDockView *self, SEL _cmd, UITraitCollection *previousTrait) {
 
 	origTCDC(self, _cmd, previousTrait);
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueHideDockBackgroundNotification object:nil];
+
+	// credits & slightly modified from ⇝ https://github.com/ren7995/Atria/blob/master/Hooks/DockView.xm
+	// turns out NSNotificationCenter wasn't bulletproof in the end, at least on iOS 15+
+	// the fact that this works and performSelector:withObject: doesn't is just cursed tho, but whatever
+	[self performSelector:@selector(setBackgroundAlpha:) withObject:nil afterDelay:0];
 
 }
 
@@ -267,7 +271,7 @@ __attribute__((constructor)) static void init() {
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(dockHeight), (IMP) &overrideDockHeight, (IMP *) &origDockHeight);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(setBackgroundAlpha:), (IMP) &overrideSetBackgroundAlpha, (IMP *) &origSetBackgroundAlpha);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(hitTest:withEvent:), (IMP) &overrideHitTestPointWithEvent, (IMP *) &origHitTestPointWithEvent);
-	MSHookMessageEx(kClass(@"UIScreen"), @selector(traitCollectionDidChange:), (IMP) &overrideTCDC, (IMP *) &origTCDC);
+	MSHookMessageEx(kClass(@"SBDockView"), @selector(traitCollectionDidChange:), (IMP) &overrideTCDC, (IMP *) &origTCDC);
 	MSHookMessageEx(kClass(@"SBRootFolderDockIconListView"), @selector(didMoveToWindow), (IMP) &overrideDMTW, (IMP *) &origDMTW);
 	MSHookMessageEx(kClass(@"SBHomeHardwareButton"), @selector(singlePressUp:), (IMP) &overrideSinglePressUp, (IMP *) &origSinglePressUp);
 	MSHookMessageEx(kClass(@"SBIconScrollView"), @selector(didMoveToSuperview), (IMP) &overrideIconScrollViewDMTS, (IMP *) &origIconScrollViewDMTS);
