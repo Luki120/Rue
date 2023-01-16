@@ -2,25 +2,22 @@
 
 <img src="https://i.imgur.com/wODRj2G.jpeg" width="300">
 
-## Search across the internet from your dock and customize it on the fly
-
 ## Features
 
 * Custom search bar Y position
 * Custom search bar width
 * Hide dock background
 * Hide search bar background
+* Supported search engines:
 
-## Search engines
-
-* Bing
-* DuckDuckGo
-* Ecosia
-* Google
-* SearX
-* Yahoo
-* Yandex
-* YouTube
+	* Bing
+	* DuckDuckGo
+	* Ecosia
+	* Google
+	* SearX
+	* Yahoo
+	* Yandex
+	* YouTube
 
 ## Socials
 
