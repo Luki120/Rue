@@ -7,7 +7,6 @@
 * Custom search bar Y position
 * Custom search bar width
 * Hide dock background
-* Hide search bar background
 * Supported search engines:
 
 	* Bing
