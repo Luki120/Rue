@@ -5,7 +5,6 @@ static NSNotificationName const RueFadeOutSubviewsNotification = @"RueFadeOutSub
 static NSNotificationName const RueSetupNotification = @"RueSetupNotification";
 static NSNotificationName const RueHideDockBackgroundNotification = @"RueHideDockBackgroundNotification";
 static NSNotificationName const RueSetupSearchEngineNotification = @"RueSetupSearchEngineNotification";
-static NSNotificationName const RueHideSearchBarBackgroundNotification = @"RueHideSearchBarBackgroundNotification";
 
 @interface NSDistributedNotificationCenter : NSNotificationCenter
 @end

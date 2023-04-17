@@ -3,7 +3,7 @@
 
 static LukiTwitterCell *cell;
 
-#define kRueTintColor [UIColor colorWithRed:0.74 green:0.45 blue:0.83 alpha: 1.0];
+#define kRueTintColor [UIColor colorWithRed:0.74 green:0.45 blue:0.83 alpha: 1.0]
 
 @interface RueRootVC () <LukiTwitterCellDelegate>
 @end
@@ -90,7 +90,6 @@ static LukiTwitterCell *cell;
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueSetupNotification object:nil];
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueSetupSearchEngineNotification object:nil];
 	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueHideDockBackgroundNotification object:nil];
-	[NSDistributedNotificationCenter.defaultCenter postNotificationName:RueHideSearchBarBackgroundNotification object:nil];
 
 }
 
