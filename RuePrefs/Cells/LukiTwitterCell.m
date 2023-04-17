@@ -107,15 +107,17 @@ static UIAlertController *alertController;
 		@"avatarImageView": avatarImageView
 	};
 
-	NSString *formatHorizontalStackViewCenterY = @"H:[superview]-(<=1)-[horizontalStackView]";
-	NSString *formatHorizontalStackViewLeading = @"H:|-15-[horizontalStackView]";
-	NSString *formatAvatarImageWidth = @"H:[avatarImageView(==40)]";
-	NSString *formatAvatarImageHeight = @"V:[avatarImageView(==40)]";
+	NSArray *formatStrings = @[
+		@"H:|-15-[horizontalStackView]",
+		@"H:[avatarImageView(==40)]",
+		@"V:[avatarImageView(==40)]"
+	];
 
-	[self setupConstraintsWithFormat: formatHorizontalStackViewCenterY withOptions: NSLayoutFormatAlignAllCenterY];
-	[self setupConstraintsWithFormat: formatHorizontalStackViewLeading];
-	[self setupConstraintsWithFormat: formatAvatarImageWidth];
-	[self setupConstraintsWithFormat: formatAvatarImageHeight];
+	for(NSString *format in formatStrings) [self setupConstraintsWithFormat: format];
+
+	NSString *formatHorizontalStackViewCenterY = @"H:[superview]-(<=1)-[horizontalStackView]";
+
+	[self setupConstraintsWithFormat:formatHorizontalStackViewCenterY withOptions: NSLayoutFormatAlignAllCenterY];
 
 }
 
@@ -177,7 +179,6 @@ static UIAlertController *alertController;
 	UIStackView *stackView = [UIStackView new];
 	stackView.axis = axis;
 	stackView.spacing = spacing;
-	stackView.distribution = UIStackViewDistributionFill;
 	return stackView;
 
 }

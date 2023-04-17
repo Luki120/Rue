@@ -57,13 +57,15 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 	NSDictionary *dict = @{ @"rueSearchBar": self.rueSearchBar };
 
-	NSString *formatTop = @"V:|-[rueSearchBar]";
-	NSString *formatHeight = @"V:[rueSearchBar(==50)]";
-	NSString *formatLeadingTrailing = @"H:|-15-[rueSearchBar]-15-|";
+	NSArray *formatStrings = @[
+		@"V:|-[rueSearchBar]",
+		@"V:[rueSearchBar(==50)]",
+		@"H:|-15-[rueSearchBar]-15-|"
+	];
 
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatTop options:0 metrics:nil views:dict]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatHeight options:0 metrics:nil views:dict]];
-	[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:formatLeadingTrailing options:0 metrics:nil views:dict]];
+	for(NSString *format in formatStrings)
+		[NSLayoutConstraint activateConstraints:
+			[NSLayoutConstraint constraintsWithVisualFormat:format options:0 metrics:nil views:dict]];
 
 }
 
