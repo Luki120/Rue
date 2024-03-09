@@ -9,7 +9,7 @@ static UIView *dimmedView;
 
 static UITapGestureRecognizer *tapGestureRecognizer;
 
-static NSNotificationName const RueDimIconsNowNotification = @"RueDimIconsNowNotification";
+static NSNotificationName const RueDidDimIconsNowNotification = @"RueDidDimIconsNowNotification";
 static NSNotificationName const RueDimUndimIconsNowNotification = @"RueDimUndimIconsNowNotification";
 
 #define kClass(class) NSClassFromString(class)
@@ -78,7 +78,7 @@ static void new_keyboardWillShow(SBDockView *self, SEL _cmd) {
 
 	UILayoutGuide *guide = self.superview.superview.superview.superview.superview.safeAreaLayoutGuide;
 
-	transitionViews(self, NO, 0.85, 0.45, guide.topAnchor, 10, RueDimIconsNowNotification, ^(BOOL finished) {
+	transitionViews(self, NO, 0.85, 0.45, guide.topAnchor, 10, RueDidDimIconsNowNotification, ^(BOOL finished) {
 
 		tapGestureRecognizer.enabled = YES;
 
@@ -113,11 +113,11 @@ static id overrideIWF(SBDockView *self, SEL _cmd, CGRect frame) {
 
 	[self setupRue];
 
-	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow) name:RueFadeInSubviewsNotification object:nil];
-	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide) name:RueFadeOutSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow) name:RueDidFadeInSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide) name:RueDidFadeOutSubviewsNotification object:nil];
 
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupRue) name:RueSetupNotification object:nil];
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setBackgroundAlpha:) name:RueHideDockBackgroundNotification object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupRue) name:RueDidSetupNotification object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setBackgroundAlpha:) name:RueDidHideDockBackgroundNotification object:nil];
 
 	return origStub;
 
@@ -139,7 +139,7 @@ static void overrideDMTW(SBRootFolderDockIconListView *self, SEL _cmd) {
 	origDMTW(self, _cmd);
 	[self setupDockConstraints];
 
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupDockConstraints) name:RueSetupNotification object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupDockConstraints) name:RueDidSetupNotification object:nil];
 
 }
 
@@ -206,23 +206,25 @@ static void overrideSinglePressUp(SBHomeHardwareButton *self, SEL _cmd, id press
 	origSinglePressUp(self, _cmd, pressUp);
 
 	if(rueSearchView.rueSearchBar.window == nil) return;
-	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeOutSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueDidFadeOutSubviewsNotification object:nil];
 
 }
 
-static void (*origIconScrollViewDMTS)(SBIconScrollView *, SEL);
-static void overrideIconScrollViewDMTS(SBIconScrollView *self, SEL _cmd) {
+static id (*origIconScrollViewIWF)(SBIconScrollView *, SEL, CGRect);
+static id overrideIconScrollViewIWF(SBIconScrollView *self, SEL _cmd, CGRect frame) {
 
-	origIconScrollViewDMTS(self, _cmd);
+	id orig = origIconScrollViewIWF(self, _cmd, frame);
 
-	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(dimIcons:) name:RueDimIconsNowNotification object:nil];
+	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(dimIcons:) name:RueDidDimIconsNowNotification object:nil];
 	[NSNotificationCenter.defaultCenter addObserver:self selector:@selector(dimIcons:) name:RueDimUndimIconsNowNotification object:nil];
+
+	return orig;
 
 }
 
 static void new_dimIcons(SBIconScrollView *self, SEL _cmd, NSNotification *notification) {
 
-	self.alpha = [notification.name isEqualToString: RueDimIconsNowNotification] ? 0.45 : 1;
+	self.alpha = [notification.name isEqualToString: RueDidDimIconsNowNotification] ? 0.45 : 1;
 
 }
 
@@ -260,12 +262,11 @@ static void overrideVDL(SBHomeScreenViewController *self, SEL _cmd) {
 
 static void new_rue_didDoubleTap(SBHomeScreenViewController *self, SEL _cmd) {
 
-	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeOutSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueDidFadeOutSubviewsNotification object:nil];
 
 }
 
-
-__attribute__((constructor)) static void init() {
+__attribute__((constructor)) static void init(void) {
 
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(initWithFrame:), (IMP) &overrideIWF, (IMP *) &origIWF);
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(dockHeight), (IMP) &overrideDockHeight, (IMP *) &origDockHeight);
@@ -274,7 +275,7 @@ __attribute__((constructor)) static void init() {
 	MSHookMessageEx(kClass(@"SBDockView"), @selector(traitCollectionDidChange:), (IMP) &overrideTCDC, (IMP *) &origTCDC);
 	MSHookMessageEx(kClass(@"SBRootFolderDockIconListView"), @selector(didMoveToWindow), (IMP) &overrideDMTW, (IMP *) &origDMTW);
 	MSHookMessageEx(kClass(@"SBHomeHardwareButton"), @selector(singlePressUp:), (IMP) &overrideSinglePressUp, (IMP *) &origSinglePressUp);
-	MSHookMessageEx(kClass(@"SBIconScrollView"), @selector(didMoveToSuperview), (IMP) &overrideIconScrollViewDMTS, (IMP *) &origIconScrollViewDMTS);
+	MSHookMessageEx(kClass(@"SBIconScrollView"), @selector(initWithFrame:), (IMP) &overrideIconScrollViewIWF, (IMP *) &origIconScrollViewIWF);
 	MSHookMessageEx(kClass(@"SBHomeScreenViewController"), @selector(viewDidLoad), (IMP) &overrideVDL, (IMP *) &origVDL);
 
 	class_addMethod(kClass(@"SBDockView"), @selector(setupRue), (IMP) &new_setupRue, "v@:");

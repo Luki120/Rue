@@ -1,10 +1,14 @@
-static NSString *const kPath = @"/var/mobile/Library/Preferences/me.luki.rueprefs.plist";
+@import libroot;
 
-static NSNotificationName const RueFadeInSubviewsNotification = @"RueFadeInSubviewsNotification";
-static NSNotificationName const RueFadeOutSubviewsNotification = @"RueFadeOutSubviewsNotification";
-static NSNotificationName const RueSetupNotification = @"RueSetupNotification";
-static NSNotificationName const RueHideDockBackgroundNotification = @"RueHideDockBackgroundNotification";
-static NSNotificationName const RueSetupSearchEngineNotification = @"RueSetupSearchEngineNotification";
+#define jbRootPath(path) JBROOT_PATH_NSSTRING(path)
+
+static NSString *const kSuiteName = @"me.luki.rueprefs";
+
+static NSNotificationName const RueDidFadeInSubviewsNotification = @"RueDidFadeInSubviewsNotification";
+static NSNotificationName const RueDidFadeOutSubviewsNotification = @"RueDidFadeOutSubviewsNotification";
+static NSNotificationName const RueDidSetupNotification = @"RueDidSetupNotification";
+static NSNotificationName const RueDidHideDockBackgroundNotification = @"RueDidHideDockBackgroundNotification";
+static NSNotificationName const RueDidSetupSearchEngineNotification = @"RueDidSetupSearchEngineNotification";
 
 @interface NSDistributedNotificationCenter : NSNotificationCenter
 @end

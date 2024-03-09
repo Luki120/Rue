@@ -1,13 +1,16 @@
 @import ObjectiveC.runtime;
 @import Preferences.PSSpecifier;
 @import Preferences.PSTableCell;
+#import "Headers/Common.h"
+#import "../Categories/NSMutableAttributedString+Attributed.h"
 #import "../Managers/RueImageManager.h"
 
 
+@class LukiTwitterCell;
 @protocol LukiTwitterCellDelegate
 
 @required
-- (void)lukiTwitterCellShouldPresentAlertController:(UIViewController *)controller;
+- (void)lukiTwitterCell:(LukiTwitterCell *)cell shouldPresentAlertController:(UIAlertController *)alertController;
 
 @end
 

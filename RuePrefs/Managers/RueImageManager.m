@@ -3,6 +3,8 @@
 #import "RueImageManager.h"
 
 
+#define Async(block) dispatch_async(dispatch_get_main_queue(), block)
+
 typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 	RueImageManagerErrorInvalidImage,
 	RueImageManagerErrorInvalidURL,
@@ -12,7 +14,7 @@ typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 
 @implementation RueImageManager {
 
-	NSCache<NSString *, UIImage *> *imageCache;
+	NSCache<NSString *, UIImage *> *_imageCache;
 
 }
 
@@ -21,7 +23,7 @@ typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 	self = [super init];
 	if(!self) return nil;
 
-	imageCache = [NSCache new];
+	_imageCache = [NSCache new];
 
 	return self;
 
@@ -29,9 +31,9 @@ typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 
 
 - (NSURLSessionTask *)fetchImageWithURLString:(NSString *)urlString
-	completion:(void(^)(UIImage *image, NSError *error))completion {
+	completion:(void(^)(UIImage *, NSError *))completion {
 
-	UIImage *cachedImage = [imageCache objectForKey: urlString];
+	UIImage *cachedImage = [_imageCache objectForKey: urlString];
 
 	if(cachedImage) {
 		completion(cachedImage, nil);
@@ -48,24 +50,24 @@ typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 		completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 
 		if(error) {
-			dispatch_async(dispatch_get_main_queue(), ^{ completion(nil, error); });
+			Async( ^{ completion(nil, error); });
 			return;
 		}
 
 		if(!data)
-			dispatch_async(dispatch_get_main_queue(), ^{
+			Async( ^{
 				completion(nil, [self errorWithCode: RueImageManagerErrorNetworkError]);
 			});
 
 		UIImage *image = [UIImage imageWithData: data];
 
 		if(!image)
-			dispatch_async(dispatch_get_main_queue(), ^{
+			Async( ^{
 				completion(nil, [self errorWithCode: RueImageManagerErrorInvalidImage]);
 			});
 
-		[imageCache setObject:image forKey: urlString];
-		dispatch_async(dispatch_get_main_queue(), ^{ completion(image, nil); });
+		[_imageCache setObject:image forKey: urlString];
+		Async( ^{ completion(image, nil); });
 
 	}];
 
@@ -78,8 +80,7 @@ typedef NS_CLOSED_ENUM(NSInteger, RueImageManagerError) {
 
 - (NSError *)errorWithCode:(RueImageManagerError)errorCode {
 
-	NSError *error = [NSError errorWithDomain:@"me.luki.rue" code:errorCode userInfo:nil];
-	return error;
+	return [NSError errorWithDomain:@"me.luki.rue" code:errorCode userInfo:nil];
 
 }
 

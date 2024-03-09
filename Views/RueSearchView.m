@@ -1,11 +1,15 @@
 #import "RueSearchView.h"
 
 
+@interface RueSearchView () <UISearchBarDelegate>
+@end
+
+
 @implementation RueSearchView {
 
-	NSString *httpURLString;
-	NSString *searchableString;
-	NSString *vanillaURLString;
+	NSString *_httpURLString;
+	NSString *_searchableString;
+	NSString *_vanillaURLString;
 
 }
 
@@ -18,21 +22,24 @@ static NSString *const kYahooEngine = @"https://search.yahoo.com/search?q=";
 static NSString *const kYandexEngine = @"https://yandex.com/search/?text=";
 static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search_query=";
 
+// ! Lifecycle
+
 - (id)init {
 
 	self = [super init];
 	if(!self) return nil;
 
-	[self setupRueSearchBar];
+	[self _setupRueSearchBar];
 
-	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(setupSearchEngine) name:RueSetupSearchEngineNotification object:nil];
+	[NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(_setupSearchEngine) name:RueDidSetupSearchEngineNotification object:nil];
 
 	return self;
 
 }
 
+// ! Private
 
-- (void)setupRueSearchBar {
+- (void)_setupRueSearchBar {
 
 	self.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -48,12 +55,12 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 	self.rueSearchBar.translatesAutoresizingMaskIntoConstraints = NO;
 	[self addSubview: self.rueSearchBar];
 
-	[self layoutRueSearchBar];
+	[self _layoutRueSearchBar];
 
 }
 
 
-- (void)layoutRueSearchBar {
+- (void)_layoutRueSearchBar {
 
 	NSDictionary *dict = @{ @"rueSearchBar": self.rueSearchBar };
 
@@ -70,56 +77,55 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 }
 
 
-- (void)setupSearchEngine {
+- (void)_setupSearchEngine {
 
 	loadShit();
 	switch(searchEngineType) {
-		case 0: [self setupSearchEngineWithEngine: kBingEngine]; break;
-		case 1: [self setupSearchEngineWithEngine: kDuckDuckGoEngine]; break;
-		case 2: [self setupSearchEngineWithEngine: kEcosiaEngine]; break;
-		case 3: [self setupSearchEngineWithEngine: kGoogleEngine]; break;
-		case 4: [self setupSearchEngineWithEngine: kSearXEngine]; break;
-		case 5: [self setupSearchEngineWithEngine: kYahooEngine]; break;
-		case 6: [self setupSearchEngineWithEngine: kYandexEngine]; break;
-		case 7: [self setupSearchEngineWithEngine: kYouTubeEngine]; break;
+		case 0: [self _setupSearchEngineWithEngine: kBingEngine]; break;
+		case 1: [self _setupSearchEngineWithEngine: kDuckDuckGoEngine]; break;
+		case 2: [self _setupSearchEngineWithEngine: kEcosiaEngine]; break;
+		case 3: [self _setupSearchEngineWithEngine: kGoogleEngine]; break;
+		case 4: [self _setupSearchEngineWithEngine: kSearXEngine]; break;
+		case 5: [self _setupSearchEngineWithEngine: kYahooEngine]; break;
+		case 6: [self _setupSearchEngineWithEngine: kYandexEngine]; break;
+		case 7: [self _setupSearchEngineWithEngine: kYouTubeEngine]; break;
 	}
 
 }
 
 
-- (void)setupSearchEngineWithEngine:(NSString *)engine {
+- (void)_setupSearchEngineWithEngine:(NSString *)engine {
 
-	searchableString = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+	_searchableString = [NSString stringWithFormat:@"%@%@", engine, [self.rueSearchBar.text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
 
 }
 
 
-- (void)setupURLTypesForSearchBar:(UISearchBar *)rueSearchBar {
+- (void)_setupURLTypesForSearchBar:(UISearchBar *)rueSearchBar {
 
-	httpURLString = [NSString stringWithFormat:@"%@", rueSearchBar.text];
-	vanillaURLString = [NSString stringWithFormat:@"https://%@", rueSearchBar.text];
+	_httpURLString = [NSString stringWithFormat:@"%@", rueSearchBar.text];
+	_vanillaURLString = [NSString stringWithFormat:@"https://%@", rueSearchBar.text];
 
-	NSURL *httpURL = [NSURL URLWithString: httpURLString];
-	NSURL *searchableStringURL = [NSURL URLWithString: searchableString];
-	NSURL *vanillaURL = [NSURL URLWithString: vanillaURLString];
+	NSURL *httpURL = [NSURL URLWithString: _httpURLString];
+	NSURL *searchableStringURL = [NSURL URLWithString: _searchableString];
+	NSURL *vanillaURL = [NSURL URLWithString: _vanillaURLString];
 
 	if([rueSearchBar.text hasPrefix:@"http"])
-
 		[UIApplication.sharedApplication openURL:httpURL options:@{} completionHandler:nil];
 
 	else if([rueSearchBar.text hasPrefix:@"www"])
-
 		[UIApplication.sharedApplication openURL:vanillaURL options:@{} completionHandler:nil];
 
 	else [UIApplication.sharedApplication openURL:searchableStringURL options:@{} completionHandler:nil];
 
 }
 
+// ! UISearchBarDelegate
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
 
-	[self setupSearchEngine];
-	[self setupURLTypesForSearchBar: searchBar];
+	[self _setupSearchEngine];
+	[self _setupURLTypesForSearchBar: searchBar];
 
 	[searchBar resignFirstResponder];
 
@@ -130,7 +136,7 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar {
 
-	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeInSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueDidFadeInSubviewsNotification object:nil];
 	return YES;
 
 }
@@ -138,7 +144,7 @@ static NSString *const kYouTubeEngine = @"https://www.youtube.com/results?search
 
 - (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar {
 
-	[NSNotificationCenter.defaultCenter postNotificationName:RueFadeOutSubviewsNotification object:nil];
+	[NSNotificationCenter.defaultCenter postNotificationName:RueDidFadeOutSubviewsNotification object:nil];
 	return YES;
 
 }
