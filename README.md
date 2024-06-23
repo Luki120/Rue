@@ -1,6 +1,6 @@
 # Rue
 
-<img src="https://raw.githubusercontent.com/Luki120/luki120.github.io/master/assets/Tweaks/SpringBoard/Rue/Rue.png" width="300">
+<img src="Assets/Rue.png" width="300">
 
 ## Features
 
