@@ -1,6 +1,6 @@
-@import libroot;
+#import <rootless.h>
 
-#define jbRootPath(path) JBROOT_PATH_NSSTRING(path)
+#define jbRootPath(path) ROOT_PATH_NS(path)
 
 static NSString *const kSuiteName = @"me.luki.rueprefs";
 
