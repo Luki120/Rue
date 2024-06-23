@@ -34,6 +34,6 @@ jobs:
           THEOS=theos gmake clean package TARGET="iphone:clang:16.5:14.0" FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: packages/*.deb
